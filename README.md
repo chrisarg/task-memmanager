@@ -4,7 +4,7 @@ Task::MemManager - A memory allocated and manager for low level code in Perl.
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 
@@ -138,16 +138,17 @@ The examples are best run sequentially in a single Perl script.
             allocator => 'CMalloc',
         }
     );
-      my $mem = Task::MemManager->new(
-        20, 1,
-        {
-            init_value => 'A',
-            death_stub => sub {
-                my ($obj_ref) = @_;
-                printf "Killing 0x%8x \n", $obj_ref->{identifier};
-            },
-            allocator => 'CMalloc',
-        }
+    printf( "%10s object is %s\n", ' mem', $mem );
+    $mem = Task::MemManager->new(
+      20, 1,
+      {
+          init_value => 'A',
+          death_stub => sub {
+              my ($obj_ref) = @_;
+              printf "Killing 0x%8x \n", $obj_ref->{identifier};
+          },
+          allocator => 'CMalloc',
+      }
     );
 
 Print the buffer objects
@@ -155,7 +156,7 @@ Print the buffer objects
     printf( "%10s object is %s\n", ' memdeath', $memdeath );
     printf( "%10s object is %s\n", ' mem', $mem );
 
-Killing the buffer should give you a message from the death stub
+If you would like to kill a buffer immediately, you can undefine it:
 
      undef $memdeath;
     
@@ -209,7 +210,7 @@ Now let's extract the region and print it
     my $region = $mem->extract_buffer_region(5, 10);
     print_hex_values( $region, 8 );
 
-## Example 3: Shallow copying defers object destruction
+## Example 3: Shallow copying defers buffer deallocation
 
 Making a shallow copy of the buffer:
 
@@ -254,7 +255,7 @@ a new buffer with new contents (this Example continues at the end of Example 3)
       'Alpha_copy after modification', $mem_cp->get_buffer();
     print_hex_values( $mem_cp->extract_buffer_region, 10 );
 
-## Example 5: Delayed garbage collection
+## Example 5: Fine control over garbage collection
 
 Delayed garbage collection is useful when you want to keep a buffer alive
 for a while after it goes out of scope. This is useful when you want to
@@ -295,12 +296,14 @@ script. This example is entirely self-contained.
 
 List the objects with delayed garbage collection
 
+    my $delayed_gc_objects = Task::MemManager->get_delayed_gc_objects();
     printf "Objects with delayed GC : " 
       . ("0x%8x " x @$delayed_gc_objects) 
       . "\n", @$delayed_gc_objects;
 
 Time the precise moment of death:
 
+    say "Undefining an object with delayed GC does not kill it!";
     undef $mem_cp2;
     say "End of the program - see how Perl's destroying all "
       . "delayed GC objects along with the rest of the objects";
