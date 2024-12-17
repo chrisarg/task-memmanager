@@ -235,7 +235,7 @@ sub get_delayed_gc_objects {
 
 =head1 NAME
 
-Task::MemManager - A memory allocated and manager for low level code in Perl.
+Task::MemManager - A memory allocator and manager for low-level code in Perl.
 
 =head1 VERSION
 
@@ -260,7 +260,7 @@ version 0.02
 
 =head1 DESCRIPTION
 
-Task::MemManager is a memory allocator and manager designed for low level code in Perl. 
+Task::MemManager is a memory allocator and manager designed for low-level code in Perl. 
 It provides functionalities to allocate, manage, and manipulate memory buffers.
 
 =head1 METHODS
